@@ -24,7 +24,7 @@ public class setting_gui : MonoBehaviour
         miniMap = gameObject.transform.GetChild(0).gameObject;
         settingMenu = gameObject.transform.GetChild(1).gameObject;
         TimeText = gameObject.transform.GetChild(2).gameObject;
-        startCountDown(15.0f, demoTime, 10);
+        //startCountDown(15.0f, demoTime, 10);
         showUI();
     }
 
@@ -93,7 +93,7 @@ public class setting_gui : MonoBehaviour
         countDownTime = time;
         doCountDown = true;
         showUI();
-        method.DynamicInvoke(args);
+        //method.DynamicInvoke(args);
     }
     private void demoTime(int i)
     {
