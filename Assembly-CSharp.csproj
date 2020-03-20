@@ -60,14 +60,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ChestController.cs" />
     <Compile Include="Assets\DownloadAssests\DungeonVoxels\Scripts\Knight.cs" />
     <Compile Include="Assets\DownloadAssests\DungeonVoxels\Scripts\LightFlicker.cs" />
     <Compile Include="Assets\DownloadAssests\DungeonVoxels\Scripts\SpikeTrap.cs" />
     <Compile Include="Assets\DownloadAssests\DungeonVoxels\Scripts\TargetFollow.cs" />
     <Compile Include="Assets\MenuUIEvent.cs" />
+    <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\PlayerControllerV2.cs" />
     <Compile Include="Assets\Scripts\setting_gui.cs" />
+    <Compile Include="Assets\Scripts\SpikeTrapSound.cs" />
     <None Include="Assets\DownloadAssests\3DVoxel_Free\FantasyPack\readme_en.txt" />
     <None Include="Assets\DownloadAssests\3DVoxel_Free\FantasyPack\readme_jp.txt" />
     <Reference Include="Cinemachine">

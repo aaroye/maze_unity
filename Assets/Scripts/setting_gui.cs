@@ -40,6 +40,7 @@ public class setting_gui : MonoBehaviour
                 Time.timeScale = 1;
                 AudioListener.volume = 1;
                 Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
                 showUI();
             }
             //else if game isn't paused, then pause it
@@ -49,6 +50,7 @@ public class setting_gui : MonoBehaviour
                 AudioListener.volume = 0;
                 Time.timeScale = 0;
                 Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
                 showUI();
             }
         }

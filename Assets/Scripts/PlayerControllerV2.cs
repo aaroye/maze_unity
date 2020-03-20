@@ -4,20 +4,24 @@ using UnityEngine;
 
 public class PlayerControllerV2 : MonoBehaviour
 {
-    public Vector3 Tester;
+    public AudioSource audioData;
     public Camera TPSCamera;
     public Camera FPSCamera;
     public float MovementSpeed = 10f;
     public float MouseSensitivity = 40f;
     public Animator anim;
+    public bool Alive = true;
+    public bool isWin = false;
     private Vector2 KeyboardMovement;
     private Vector2 MouseMovement;
     private float xRotation;
     private bool CamTrigger = false;
+    
     // Start is called before the first frame update
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     // Update is called once per frame
@@ -25,6 +29,7 @@ public class PlayerControllerV2 : MonoBehaviour
     {
         GetInput();
         AnimationSet();
+        FootStepSound();
         if (CamTrigger)
         {
             FPSCamera.enabled = !FPSCamera.enabled;
@@ -56,6 +61,7 @@ public class PlayerControllerV2 : MonoBehaviour
 
     void PlayerMove()
     {
+        if (!Alive || isWin) return;
         if (TPSCamera.enabled)
         {
             Vector3 CamToPlayer = TPSCamera.transform.position - transform.position;
@@ -94,4 +100,37 @@ public class PlayerControllerV2 : MonoBehaviour
         if (TPSCamera.enabled) anim.SetFloat("MovingSpeed", a);
     }
 
+    void FootStepSound()
+    {
+        if(KeyboardMovement.magnitude > 0.5f && !audioData.isPlaying && Alive && !isWin)
+        {
+            audioData.Play();
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Spike" && Alive)
+        {
+            anim.SetTrigger("Death");
+            Alive = !Alive;
+        }
+        else if (other.tag == "Chest")
+        {
+            Win();
+        }
+    }
+
+    public void Respawn()
+    {
+        Alive = true;
+        anim.SetTrigger("Respawn");
+    }
+
+    public void Win()
+    {
+        ChestController._instance.Open();
+        anim.SetTrigger("Win");
+        isWin = true;
+    }
 }
