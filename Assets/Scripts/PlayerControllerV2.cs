@@ -8,8 +8,11 @@ public class PlayerControllerV2 : MonoBehaviour
     public Camera TPSCamera;
     public Camera FPSCamera;
     public float MovementSpeed = 10f;
+    public float MouseSensitivity = 40f;
     public Animator anim;
     private Vector2 KeyboardMovement;
+    private Vector2 MouseMovement;
+    private float xRotation;
     private bool CamTrigger = false;
     // Start is called before the first frame update
     void Start()
@@ -39,6 +42,7 @@ public class PlayerControllerV2 : MonoBehaviour
     void GetInput()
     {
         KeyboardMovement = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        MouseMovement = new Vector2(Input.GetAxis("Mouse X") * MouseSensitivity * Time.deltaTime, Input.GetAxis("Mouse Y") * MouseSensitivity * Time.deltaTime);
         if (Input.GetKeyDown(KeyCode.F5))
         {
             CamTrigger = !CamTrigger;
@@ -52,16 +56,42 @@ public class PlayerControllerV2 : MonoBehaviour
 
     void PlayerMove()
     {
-        
-        transform.rotation = Quaternion.LookRotation(new Vector3(TPSCamera.transform.forward.x, 0, TPSCamera.transform.forward.z), TPSCamera.transform.up);
-        Vector3 velocity = transform.forward * KeyboardMovement.y * MovementSpeed + transform.right * KeyboardMovement.x * MovementSpeed;
-        velocity.y = GetComponent<Rigidbody>().velocity.y;
-        GetComponent<Rigidbody>().velocity = velocity;
+        if (TPSCamera.enabled)
+        {
+            Vector3 CamToPlayer = TPSCamera.transform.position - transform.position;
+            CamToPlayer *= -1;
+            CamToPlayer.Set(CamToPlayer.x, 0f, CamToPlayer.z);
+            CamToPlayer.Normalize();
+            Debug.DrawLine(TPSCamera.transform.position, CamToPlayer, Color.green);
+
+            Vector3 velocity = CamToPlayer * KeyboardMovement.y * MovementSpeed + Quaternion.Euler(0f, 90f, 0) * CamToPlayer * KeyboardMovement.x * MovementSpeed;
+
+            if (velocity.magnitude >= 0.1f)
+            {
+                Quaternion dirQ = Quaternion.LookRotation(velocity);
+                Quaternion slerp = Quaternion.Slerp(transform.rotation, dirQ, velocity.magnitude * 4f * Time.deltaTime);
+                GetComponent<Rigidbody>().MoveRotation(slerp);
+            }
+            velocity.y = GetComponent<Rigidbody>().velocity.y;
+            GetComponent<Rigidbody>().velocity = velocity;
+        }
+        else
+        {
+            xRotation -= MouseMovement.y;
+            xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
+            FPSCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+            transform.Rotate(Vector3.up * MouseMovement.x);
+            Vector3 velocity = transform.forward * KeyboardMovement.y * MovementSpeed + transform.right * KeyboardMovement.x * MovementSpeed;
+            velocity.y = GetComponent<Rigidbody>().velocity.y;
+            GetComponent<Rigidbody>().velocity = velocity;
+        }
     }
 
     void AnimationSet()
     {
-        if (TPSCamera.enabled) anim.SetFloat("MoveDir", (KeyboardMovement.y + 1) / 2);
+        float a = KeyboardMovement.magnitude;
+        if (TPSCamera.enabled) anim.SetFloat("MovingSpeed", a);
     }
 
 }

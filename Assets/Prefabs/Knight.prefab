@@ -480,7 +480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 949cdaed8668083488798804dccb3c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MouseSensitivity: 25
+  MouseSensitivity: 10
   MovementSpeed: 3
   CamTransform: {fileID: 534669905}
   FPSCamera: {fileID: 534669904}
