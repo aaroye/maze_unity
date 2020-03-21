@@ -10,18 +10,24 @@ public class PlayerControllerV2 : MonoBehaviour
     public float MovementSpeed = 10f;
     public float MouseSensitivity = 40f;
     public Animator anim;
+    public AudioClip backgroundMusic;
+    public AudioClip winningMusic;
     public bool Alive = true;
     public bool isWin = false;
     private Vector2 KeyboardMovement;
     private Vector2 MouseMovement;
     private float xRotation;
     private bool CamTrigger = false;
-    
+    private AudioSource sound;
+
     // Start is called before the first frame update
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        sound = GameObject.Find("ThirdPersonCam").GetComponent<AudioSource>();
+        sound.clip = backgroundMusic;
+        sound.Play();
     }
 
     // Update is called once per frame
@@ -132,5 +138,9 @@ public class PlayerControllerV2 : MonoBehaviour
         ChestController._instance.Open();
         anim.SetTrigger("Win");
         isWin = true;
+        GameObject.Find("Canvas").GetComponent<setting_gui>().endCount();
+        sound.clip = winningMusic;
+        sound.loop = false;
+        sound.Play();
     }
 }

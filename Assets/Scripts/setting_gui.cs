@@ -5,11 +5,18 @@ using System.Collections.Generic;
 
 public class setting_gui : MonoBehaviour
 {
-    private bool pauseEnabled = false;
-    private bool miniMapShow = true;
+    public bool pauseEnabled = false;
+    public bool menuShow = false;
+    public bool menuStorePauseState = false;
+    private bool miniMapShow = false;
+    private bool skyboxShow = false;
+    private bool timeShow = true;
 
     private bool doCountDown = false;
-    private float startTime = 0;
+    private bool doCount = true;
+    private float startCountDownTime = 0;
+    private float startCountTime = 0;
+    private float currentCountTime = 0;
     private float countDownTime = 0;
 
     private GameObject miniMap;
@@ -18,13 +25,13 @@ public class setting_gui : MonoBehaviour
 
     void Start()
     {
-        pauseEnabled = false;
         Time.timeScale = 1;
         AudioListener.volume = 1;
         miniMap = gameObject.transform.GetChild(0).gameObject;
         settingMenu = gameObject.transform.GetChild(1).gameObject;
         TimeText = gameObject.transform.GetChild(2).gameObject;
         //startCountDown(15.0f, demoTime, 10);
+        startCount();
         showUI();
     }
 
@@ -33,30 +40,40 @@ public class setting_gui : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F4))
         {
             //check if game is already paused
-            if (pauseEnabled == true)
+            if (menuShow)
             {
                 //unpause the game
                 pauseEnabled = false;
-                Time.timeScale = 1;
-                AudioListener.volume = 1;
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-                showUI();
+                pauseEnabled = menuStorePauseState;
             }
             //else if game isn't paused, then pause it
-            else if (pauseEnabled == false)
+            else
             {
+                menuStorePauseState = pauseEnabled;
                 pauseEnabled = true;
-                AudioListener.volume = 0;
-                Time.timeScale = 0;
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-                showUI();
             }
+            menuShow = !menuShow;
         }
-        if (doCountDown && !pauseEnabled)
+        if (pauseEnabled)
         {
-            float remainTime = countDownTime - (Time.time - startTime);
+            AudioListener.volume = 0;
+            Time.timeScale = 0;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            showUI();
+        }
+        else
+        {
+            //unpause the game
+            Time.timeScale = 1;
+            AudioListener.volume = 1;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            showUI();
+        }
+        if (doCountDown && !menuShow && !pauseEnabled)
+        {
+            float remainTime = countDownTime - (Time.time - startCountDownTime);
             if (remainTime < 0.02)
             {
                 doCountDown = false;
@@ -71,27 +88,60 @@ public class setting_gui : MonoBehaviour
                 showUI();
             }
         }
+        else if (!menuShow && !pauseEnabled)
+        {
+            if (doCount) currentCountTime = Time.time;
+            float passTime = (currentCountTime - startCountTime);
+            int mm = (int)passTime / 60;
+            int ss = (int)passTime % 60;
+            int sss = (int)(passTime * 100) - (mm * 60 + ss) * 100;
+            TimeText.GetComponent<Text>().text = mm + ":" + ss + "'" + sss;
+        }
     }
     void showUI()
     {
-        if (pauseEnabled)
+        if (menuShow)
         {
-            if (miniMapShow) settingMenu.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject.GetComponent<Text>().text = "關閉小地圖";
-            else settingMenu.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject.GetComponent<Text>().text = "開啟小地圖";
+            if (miniMapShow) settingMenu.transform.GetChild(0).GetChild(0).gameObject.GetComponent<Text>().text = "關閉小地圖";
+            else settingMenu.transform.GetChild(0).GetChild(0).gameObject.GetComponent<Text>().text = "開啟小地圖";
+            if (timeShow) settingMenu.transform.GetChild(1).GetChild(0).gameObject.GetComponent<Text>().text = "關閉計時器";
+            else settingMenu.transform.GetChild(1).GetChild(0).gameObject.GetComponent<Text>().text = "開啟計時器";
+            if (skyboxShow) settingMenu.transform.GetChild(2).GetChild(0).gameObject.GetComponent<Text>().text = "關閉天空盒";
+            else settingMenu.transform.GetChild(2).GetChild(0).gameObject.GetComponent<Text>().text = "開啟天空盒";
         }
 
-        miniMap.SetActive(!pauseEnabled && miniMapShow);
-        settingMenu.SetActive(pauseEnabled);
-        TimeText.SetActive(!pauseEnabled && doCountDown);
+        miniMap.SetActive(!menuShow && miniMapShow);
+        settingMenu.SetActive(menuShow);
+        TimeText.SetActive(!menuShow && timeShow);
     }
     public void onMiniMapBtn()
     {
         miniMapShow = !miniMapShow;
         showUI();
     }
+    public void onSkyboxBtn()
+    {
+        skyboxShow = !skyboxShow;
+        if (skyboxShow)
+        {
+            GameObject.Find("ThirdPersonCam").GetComponent<Camera>().clearFlags = CameraClearFlags.Skybox;
+            GameObject.Find("FirstPersonCam").GetComponent<Camera>().clearFlags = CameraClearFlags.Skybox;  
+        }
+        else
+        {
+            GameObject.Find("ThirdPersonCam").GetComponent<Camera>().clearFlags = CameraClearFlags.SolidColor;
+            GameObject.Find("FirstPersonCam").GetComponent<Camera>().clearFlags = CameraClearFlags.SolidColor;
+        }
+        showUI();
+    }
+    public void onTimeBtn()
+    {
+        timeShow = !timeShow;
+        showUI();
+    }
     public void startCountDown(float time)
     {
-        startTime = Time.time;
+        startCountDownTime = Time.time;
         countDownTime = time;
         doCountDown = true;
         showUI();
@@ -100,5 +150,15 @@ public class setting_gui : MonoBehaviour
     private void demoTime(int i)
     {
         Debug.Log(i);
+    }
+    public void startCount()
+    {
+        startCountTime = Time.time;
+        doCount = true;
+        showUI();
+    }
+    public void endCount()
+    {
+        doCount = false;
     }
 }
