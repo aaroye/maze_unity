@@ -37,7 +37,7 @@ public class setting_gui : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F4))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             //check if game is already paused
             if (menuShow)

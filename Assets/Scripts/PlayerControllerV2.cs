@@ -27,7 +27,7 @@ public class PlayerControllerV2 : MonoBehaviour
         Cursor.visible = false;
         sound = GameObject.Find("ThirdPersonCam").GetComponent<AudioSource>();
         sound.clip = backgroundMusic;
-        sound.volume = 0.7f;
+        sound.volume = 0.5f;
         sound.Play();
     }
 
