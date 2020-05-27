@@ -31,7 +31,6 @@ public class setting_gui : MonoBehaviour
         settingMenu = gameObject.transform.GetChild(1).gameObject;
         TimeText = gameObject.transform.GetChild(2).gameObject;
         //startCountDown(15.0f, demoTime, 10);
-        startCount();
         showUI();
     }
 
