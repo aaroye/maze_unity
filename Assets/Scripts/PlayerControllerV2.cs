@@ -14,21 +14,26 @@ public class PlayerControllerV2 : MonoBehaviour
     public AudioClip winningMusic;
     public bool Alive = true;
     public bool isWin = false;
+    public Transform feetPos;
     private Vector2 KeyboardMovement;
     private Vector2 MouseMovement;
+    private bool isJump;
     private float xRotation;
     private bool CamTrigger = false;
     private AudioSource sound;
+    private Rigidbody rb;
 
     // Start is called before the first frame update
     void Start()
     {
+        isJump = false;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         sound = GameObject.Find("ThirdPersonCam").GetComponent<AudioSource>();
         sound.clip = backgroundMusic;
         sound.volume = 0.5f;
         sound.Play();
+        rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -59,6 +64,8 @@ public class PlayerControllerV2 : MonoBehaviour
         {
             CamTrigger = !CamTrigger;
         }
+        if (Input.GetKey(KeyCode.Space)) isJump = true;
+        else isJump = false;
     }
 
     void TPSCam()
@@ -83,10 +90,10 @@ public class PlayerControllerV2 : MonoBehaviour
             {
                 Quaternion dirQ = Quaternion.LookRotation(velocity);
                 Quaternion slerp = Quaternion.Slerp(transform.rotation, dirQ, velocity.magnitude * 4f * Time.deltaTime);
-                GetComponent<Rigidbody>().MoveRotation(slerp);
+                rb.MoveRotation(slerp);
             }
-            velocity.y = GetComponent<Rigidbody>().velocity.y;
-            GetComponent<Rigidbody>().velocity = velocity;
+            velocity.y = rb.velocity.y;
+            rb.velocity = velocity;
         }
         else
         {
@@ -96,8 +103,14 @@ public class PlayerControllerV2 : MonoBehaviour
             FPSCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
             transform.Rotate(Vector3.up * MouseMovement.x);
             Vector3 velocity = transform.forward * KeyboardMovement.y * MovementSpeed + transform.right * KeyboardMovement.x * MovementSpeed;
-            velocity.y = GetComponent<Rigidbody>().velocity.y;
-            GetComponent<Rigidbody>().velocity = velocity;
+            velocity.y = rb.velocity.y;
+            rb.velocity = velocity;
+        }
+        RaycastHit hit;
+        
+        if (isJump && Physics.Raycast(feetPos.position, Vector3.down, out hit, 0.2f, LayerMask.GetMask("Environment")))
+        {
+            rb.AddForce(Vector3.up * 3f, ForceMode.Impulse);
         }
     }
 
